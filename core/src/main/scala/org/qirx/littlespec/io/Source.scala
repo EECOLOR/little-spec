@@ -1,15 +1,13 @@
 package org.qirx.littlespec.io
 
 import scala.annotation.tailrec
-import scala.io.{Source => ScalaSource}
-import org.qirx.littlespec.macros.Location
 import org.qirx.littlespec.fragments.Code
+import org.qirx.littlespec.macros.Location
 
 object Source {
   def codeAtLocation(location: Location) = {
 
-    val Location(file, line, column) = location
-    val lines = ScalaSource.fromFile(file).getLines
+    val Location(file, line, column, lines) = location
     val contentAtLine = lines.drop(line - 1).mkString("\n")
     val contentAtStartPosition = contentAtLine.substring(column - 1)
 

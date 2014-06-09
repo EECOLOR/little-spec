@@ -1,7 +1,6 @@
 package testUtils.assertion
 
 import org.qirx.littlespec.Specification
-import testUtils.assertion.CollectionAssertions
 
 object CollectionAssertionsSpec extends Specification with CollectionAssertions {
 
