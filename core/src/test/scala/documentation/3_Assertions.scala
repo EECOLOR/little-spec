@@ -10,7 +10,7 @@ import org.qirx.littlespec.fragments.Text
 import testUtils.ExampleUtils
 import testUtils.FailWith
 
-object Assertions extends Specification with ExampleUtils { self =>
+object `3_Assertions` extends Specification with ExampleUtils { self =>
 
   "The simplest form of assertions are the static assertions" - {
     new SpecificationExample {

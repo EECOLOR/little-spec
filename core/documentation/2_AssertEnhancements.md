@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.AssertEnhancements`**
+**This documentation is generated from `documentation.2_AssertEnhancements`**
 
 ---
 A few enhancements are added for every type, meaning that calling the

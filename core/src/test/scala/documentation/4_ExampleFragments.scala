@@ -6,7 +6,7 @@ import org.qirx.littlespec.fragments.Success
 
 import testUtils.ExampleUtils
 
-object ExampleFragments extends Specification with ExampleUtils {
+object `4_ExampleFragments` extends Specification with ExampleUtils {
 
   """|Sometimes you want to show how your library is used, the problem with
      |documenting code examples is that they 'rot'. In case you change your

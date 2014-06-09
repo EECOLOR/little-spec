@@ -9,7 +9,7 @@ import org.qirx.littlespec.fragments.Text
 
 import testUtils.ExampleUtils
 
-object GettingStarted extends Specification with ExampleUtils { gettingStarted =>
+object `1_GettingStarted` extends Specification with ExampleUtils { gettingStarted =>
 
   """|To create a specification, extend an object or class with `Specification`
        |and create a fragment. An empty fragment results in a `TODO`.""".stripMargin -

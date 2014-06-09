@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.Assertions`**
+**This documentation is generated from `documentation.3_Assertions`**
 
 ---
 The simplest form of assertions are the static assertions

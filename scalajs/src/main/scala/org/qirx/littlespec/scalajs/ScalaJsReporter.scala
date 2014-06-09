@@ -93,7 +93,7 @@ class ScalaJsReporter {
     }
 
   private def getLocationOf(s: StackTraceElement): String =
-    s.getFileName.replace(BuildInfo.baseDirectory, "") + ":" + s.getLineNumber
+    guessedFileName(s) + ":" + s.getLineNumber
 
   private def getLocationOf(throwable: Throwable): String =
     filteredStackTrace(throwable).headOption.map { s =>
@@ -109,15 +109,17 @@ class ScalaJsReporter {
       .mkString("^(", "|", ")[^$]*")
       .replaceAll("\\.", "\\\\.")
 
+  private def guessedFileName(s: StackTraceElement) = {
+    val parts = s.getFileName.split("src/(((main|test)/(scala|java)|library)/)?")
+    parts match {
+      case Array(_, classFile) => classFile
+      case Array(other) => other
+    }
+  }
+
   private def guessedClassName(s: StackTraceElement) = {
-    val fileName = s.getFileName
-    val parts = fileName.split("src/((main/(scala|java)|library)/)?")
-    val file =
-      parts match {
-        case Array(_, classFile) => classFile
-        case Array(other) => other
-      }
-    val className = file.replace(".scala", "").replaceAll("/|\\\\", ".")
+    val fileName = guessedFileName(s)
+    val className = fileName.replace(".scala", "").replaceAll("/|\\\\", ".")
     className.split("\\$").head
   }
 }

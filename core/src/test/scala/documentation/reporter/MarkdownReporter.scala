@@ -35,8 +35,6 @@ class MarkdownReporter extends SbtReporter {
     val fullyQualifiedName = taskDef.fullyQualifiedName
     if (fullyQualifiedName startsWith "documentation.") {
 
-      println("TODO - get the target location from sbt using sbt build info")
-
       val name = fullyQualifiedName.replaceAll("documentation\\.", "")
       val file = new File(targetDirectory, name + ".md")
 

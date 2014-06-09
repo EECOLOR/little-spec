@@ -2,7 +2,7 @@ package org.qirx.littlespec.sbt
 
 import sbt.testing.SubclassFingerprint
 
-class Framework extends sbt.testing.Framework {
+class TestFramework extends sbt.testing.Framework {
 
   val name: String = "Little Spec"
 

@@ -17,7 +17,7 @@ import testUtils.assertion.CollectionAssertions
 
 object FrameworkSpec extends Specification with CollectionAssertions {
 
-  val framework = new Framework
+  val framework = new TestFramework
 
   "The framework" - {
     "must be an instance of sbt.testing.Framework" - {
@@ -127,7 +127,7 @@ object FrameworkSpec extends Specification with CollectionAssertions {
   "The Task" - {
 
     def newTask(testClass: Class[_], forObject: Boolean, args: Array[String] = Array.empty) = {
-      val framework = new Framework
+      val framework = new TestFramework
       val runner = framework.runner(args, Array.empty, getClass.getClassLoader)
 
       val taskDef = TaskDefFactory.create(testClass.getName, forObject)

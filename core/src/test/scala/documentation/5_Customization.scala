@@ -13,7 +13,7 @@ import org.qirx.littlespec.macros.Location
 import testUtils.ExampleUtils
 import testUtils.FailWith
 
-object Customization extends Specification with ExampleUtils {
+object `5_Customization` extends Specification with ExampleUtils {
   "There are a lot of ways in which you can make things more readable and usable" - {
 
     """|The easiest form of customization is the use of `Assertion` classes

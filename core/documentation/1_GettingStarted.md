@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.GettingStarted`**
+**This documentation is generated from `documentation.1_GettingStarted`**
 
 ---
 To create a specification, extend an object or class with `Specification`

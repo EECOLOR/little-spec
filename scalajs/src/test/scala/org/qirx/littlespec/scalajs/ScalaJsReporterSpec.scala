@@ -85,18 +85,18 @@ object ScalaJsReporterSpec extends Specification { self =>
       s"""[$info]  Testing output
 [$info]    - nested
 [$info]      $S success
-[$error]     $F failure (src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:21)
+[$error]     $F failure (org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:21)
 [$error]         this is a failure
 [$error]     $F unexpected
 [$error]         this is an unexpected failure
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:26
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:15
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:40
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:26
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:15
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:40
 [$error]         Generated test launcher file:1
 [$info]      $P todo - TODO
 [$info]      $P pending - pending
 [$info]      $S 1 + 2 is 3
-[$error]     $F 1 + 2 is 2 (src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:14)
+[$error]     $F 1 + 2 is 2 (org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:14)
 [$error]         3 is not equal to 2
 [$info]      - nested deeper
 [$info]        $P empty - TODO
@@ -107,16 +107,16 @@ object ScalaJsReporterSpec extends Specification { self =>
 [$info]      $S success
 [$info]        multiline
 [$error]     $F failure
-[$error]       multiline (src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:21)
+[$error]       multiline (org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:21)
 [$error]         this is a failure
 [$error]         multiline
 [$error]     $F unexpected
 [$error]       multiline
 [$error]         this is an unexpected failure
 [$error]         multiline
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:26
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:15
-[$error]         src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:40
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:26
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:15
+[$error]         org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:40
 [$error]         Generated test launcher file:1
 [$info]      $P todo
 [$info]        multiline - TODO
@@ -128,7 +128,7 @@ object ScalaJsReporterSpec extends Specification { self =>
 [$info]        x is y
 [$error]     $F val x = 1 + 2
 [$error]       val y = 2
-[$error]       x is y (src/test/scala/org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:16)
+[$error]       x is y (org/qirx/littlespec/scalajs/ScalaJsReporterSpec.scala:16)
 [$error]         3 is not equal to 2
 [$info]      - nested deeper
 [$info]        multiline
