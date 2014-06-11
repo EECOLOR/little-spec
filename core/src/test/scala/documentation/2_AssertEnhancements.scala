@@ -8,7 +8,7 @@ import testUtils.FailWith
 import testUtils.beAFailure
 import testUtils.beAFailureWithMessage
 
-object `2_AssertEnhancements` extends Specification {
+object `_2_AssertEnhancements` extends Specification {
 
   """|A few enhancements are added for every type, meaning that calling the
      |appropriate method results in an implicit resolution of that method""".stripMargin - {

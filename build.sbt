@@ -2,63 +2,99 @@ name := "little-spec"
 
 organization := "org.qirx"
 
-val directorySettings = Seq(
+scalaVersion := "2.11.1"
+
+PublishSettings.rootProjectSettings
+
+ReleaseSettings.rootProjectSettings
+
+lazy val `little-spec` = project
+  .in( file(".") )
+  .aggregate(`little-spec-sbt`, `little-spec-scalajs`)
+
+lazy val librarySettings = 
+  Seq(
+    name := "little-spec",
+    organization := "org.qirx",
+    core(Compile, "main"),
+    core(Test, "test"),
+    macroOutputAsResource
+  ) ++ 
+  PublishSettings.librarySettings
+
+lazy val `little-spec-sbt` = project
+  .in( file("sbt") )
+  .settings(
+    onlyScalaSources ++ librarySettings ++ buildInfoSettings ++ compileTestClassSettings:_*)
+  .settings(
+    libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
+    testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework"),
+    testOptions += Tests.Argument("reporter", "documentation.reporter.MarkdownReporter"))
+  .settings(
+    sourceGenerators in Compile <+= buildInfo,
+    buildInfoKeys := Seq[BuildInfoKey](
+      BuildInfoKey.map(baseDirectory in ThisBuild) { 
+        case (_, value) => "documentationTarget" -> value / "documentation" 
+      },
+      BuildInfoKey.map(baseDirectory) { 
+        case (_, value) => "testClasses" -> value / "testClasses" 
+      }
+    ),
+    buildInfoPackage := "org.qirx.littlespec"
+  )
+  .dependsOn(`little-spec-macros`)
+
+lazy val `little-spec-scalajs` = project
+  .in( file("scalajs") )
+  .settings(
+    onlyScalaSources ++ librarySettings ++ scalaJSSettings:_*)
+  .settings(
+    libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-test-bridge" % scalaJSVersion,
+    ScalaJSKeys.scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
+  )
+  .dependsOn(`little-spec-macros`)
+
+// separate project to help with IDE support
+lazy val `little-spec-macros` = project 
+  .in( file("macros") )
+  .settings(onlyScalaSources ++ macroSettings ++ scalaJSSettings:_*)
+  .settings(publishArtifact := false)  
+  
+lazy val macroSettings = 
+  Seq(
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    libraryDependencies ++= {
+      if (scalaVersion.value startsWith "2.11.") Seq.empty
+      else Seq(
+        compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
+        "org.scalamacros" %% "quasiquotes" % "2.0.0" cross CrossVersion.binary
+      )
+    }  
+  )
+  
+def core(configuration:Configuration, config:String) = 
+  unmanagedSourceDirectories in configuration +=
+    (baseDirectory in ThisBuild).value / "core" / "src" / config / "scala"  
+  
+lazy val macroOutputAsResource = 
+  unmanagedResourceDirectories in Compile += (classDirectory in Compile in `little-spec-macros`).value
+  
+lazy val onlyScalaSources = Seq(
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
   unmanagedSourceDirectories in Test := Seq((scalaSource in Test).value)
 )
 
-val coreDirectory = file("core")
+lazy val CompileTestClasses = config("compileTestClasses").extend(Compile)
 
-lazy val `little-spec-macros` = project
-  .in( file("macros") )
-  .settings(directorySettings:_*)
-
-lazy val `little-spec-core` = project
-  .in( coreDirectory )
-  .dependsOn(`little-spec-macros`)
-  .settings(directorySettings:_*)
-
-lazy val `little-spec-sbt` = project
-  .in( file("sbt") )
-  .dependsOn(`little-spec-core`)
-  .settings(directorySettings:_*)
-  .settings(
-    // compile test classes before running test in little spec sbt
-    test in Test <<= (test in Test)
-      .dependsOn(compile in Compile in `little-spec-sbt-test-classes`) 
+lazy val compileTestClassSettings = 
+  inConfig(CompileTestClasses)(Defaults.configSettings) ++
+  Seq(
+    unmanagedSourceDirectories in CompileTestClasses := Seq(baseDirectory.value / "testClasses"),
+    classDirectory in CompileTestClasses := baseDirectory.value / "testClasses",
+    unmanagedClasspath in CompileTestClasses += (classDirectory in Compile).value,
+    // compile sbt before compiling testClasses
+    compile in CompileTestClasses <<= (compile in CompileTestClasses).dependsOn(compile in Compile),
+    // compile test classes before running tests
+    test in Test <<= (test in Test).dependsOn(compile in CompileTestClasses)
   )
 
-lazy val `little-spec-scalajs` = project
-  .in( file("scalajs") )
-  .settings(directorySettings:_*)
-  .settings(
-    // depend on sources in order to give scalajs a chance to compile them
-    addSourceDirectoriesOf(`little-spec-core`),
-    addSourceDirectoriesOf(`little-spec-macros`))
-  .settings(MacroSettings.settings: _*)
-  
-lazy val `little-spec-sbt-test-classes` = project
-  .in( file("sbt/testClasses") )
-  .dependsOn(`little-spec-core`)  
- 
-// compile sbt runner before running tests in little-spec
-test in Test in `little-spec-core` <<= (test in Test in `little-spec-core`)
-  .dependsOn(compile in Compile in `little-spec-sbt`) 
-
-// add compiled class of little-spec-sbt to test classpath of little-spec-core
-unmanagedClasspath in Test in `little-spec-core` += (classDirectory in Compile in `little-spec-sbt`).value
-
-def addSourceDirectoriesOf(project:Project) = 
-  unmanagedSourceDirectories in Compile ++= (unmanagedSourceDirectories in Compile in project).value
-  
-val createReadme = taskKey[Unit]("createReadme")
-
-createReadme := {
-  val staticFiles = (file(".") * "*.md").get.filterNot(_.name == "README.md")
-  println(staticFiles)
-  val documentationFiles = (coreDirectory / "documentation" * "*.md").get.sorted
-  val files = staticFiles ++ documentationFiles
-  val content = files.map(file => IO.read(file)).mkString("\n\n")
-  val readme = file("README.md")
-  IO.write(readme, content)
-}

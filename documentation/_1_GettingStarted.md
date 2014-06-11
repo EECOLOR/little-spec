@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.1_GettingStarted`**
+**This documentation is generated from `documentation._1_GettingStarted`**
 
 ---
 To create a specification, extend an object or class with `Specification`
@@ -24,6 +24,16 @@ Fragments can be nested
     // fragment body
   }
 }
+```
+Fragments can be disabled
+```scala
+"disabled" - {
+  // fragment body
+}.disabled
+
+"disabled with a message" - {
+  // fragment body
+}.disabled("message")
 ```
 An example showing multiple features
 ```scala

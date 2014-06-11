@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.4_ExampleFragments`**
+**This documentation is generated from `documentation._4_ExampleFragments`**
 
 ---
 Sometimes you want to show how your library is used, the problem with

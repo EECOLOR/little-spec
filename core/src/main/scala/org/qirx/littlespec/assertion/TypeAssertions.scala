@@ -11,7 +11,7 @@ trait TypeAssertions { self:StaticAssertions =>
         val targetClass = implicitly[ClassTag[T]].runtimeClass
         val objClass = obj.getClass
         if (targetClass isAssignableFrom objClass) Right(success)
-        else Left(objClass.getSimpleName + " is not an instance of " + targetClass.getSimpleName)
+        else Left(objClass.getName + " is not an instance of " + targetClass.getName)
       }
     }
 }

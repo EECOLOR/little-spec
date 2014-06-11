@@ -1,4 +1,4 @@
-**This documentation is generated from `documentation.3_Assertions`**
+**This documentation is generated from `documentation._3_Assertions`**
 
 ---
 The simplest form of assertions are the static assertions
@@ -26,8 +26,8 @@ def result1 = 1 must throwA[CustomException]
 def result2 = 2 must throwAn[OtherCustomException]
 
 def message(name: String) = s"Expected '$name' but no exception was thrown"
-result1 failsWith message("CustomException")
-result2 failsWith message("OtherCustomException")
+result1 failsWith message("documentation.CustomException")
+result2 failsWith message("documentation.OtherCustomException")
 ```
 ```scala
 def code1: Any = throw new CustomException

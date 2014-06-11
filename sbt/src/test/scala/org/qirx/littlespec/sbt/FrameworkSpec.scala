@@ -3,6 +3,7 @@ package org.qirx.littlespec.sbt
 import java.io.File
 import java.net.URLClassLoader
 
+import org.qirx.littlespec.BuildInfo
 import org.qirx.littlespec.Specification
 import org.qirx.littlespec.fragments.Result
 import org.qirx.littlespec.fragments.Success
@@ -75,7 +76,7 @@ object FrameworkSpec extends Specification with CollectionAssertions {
 
   "The Runner" - {
 
-    val location = new File(BuildInfo.baseDirectory, "testClasses")
+    val location = BuildInfo.testClasses
     println(location)
     val testClassLoader = new URLClassLoader(Array(location.toURI.toURL), getClass.getClassLoader)
     def newRunner = framework.runner(Array.empty, Array.empty, testClassLoader)

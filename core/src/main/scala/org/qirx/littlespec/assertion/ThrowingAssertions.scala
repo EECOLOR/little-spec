@@ -27,7 +27,7 @@ trait ThrowingAssertions { self: StaticAssertions with BasicAssertEnhancements =
       try {
         code
         val expectedClass = implicitly[ClassTag[E]].runtimeClass
-        val expectedName = expectedClass.getSimpleName
+        val expectedName = expectedClass.getName
         Left(s"Expected '$expectedName' but no exception was thrown")
       } catch {
         case e: E => Right(handler(e))

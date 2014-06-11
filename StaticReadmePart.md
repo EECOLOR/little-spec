@@ -6,12 +6,13 @@ A small test framework for [sbt](http://www.scala-sbt.org/) and [Scala.js](http:
 Installation
 ============
 
-**sbt**
+sbt
+---
 
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %% "little-spec-sbt" % "0.1-SNAPSHOT" % "test"
+libraryDependencies += "org.qirx" %% "little-spec" % "[version]" % "test"
 ```
 
 Add the test framework
@@ -20,12 +21,13 @@ Add the test framework
 testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework")
 ```
 
-**Scala.js**
+Scala.js
+---
 
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %%% "little-spec-scalajs" % "0.1-SNAPSHOT" % "test"
+libraryDependencies += "org.qirx" %%% "little-spec" % "[version]" % "test"
 ```
 
 Add the test framework

@@ -9,7 +9,7 @@ import org.qirx.littlespec.fragments.Text
 
 import testUtils.ExampleUtils
 
-object `1_GettingStarted` extends Specification with ExampleUtils { gettingStarted =>
+object `_1_GettingStarted` extends Specification with ExampleUtils { gettingStarted =>
 
   """|To create a specification, extend an object or class with `Specification`
        |and create a fragment. An empty fragment results in a `TODO`.""".stripMargin -
@@ -42,6 +42,21 @@ object `1_GettingStarted` extends Specification with ExampleUtils { gettingStart
       }
     }.expecting {
       _ is Seq(CompoundResult(Text("outer"), Seq(todoResult("inner"))))
+    }
+
+  "Fragments can be disabled" -
+    new SpecificationExample {
+      "disabled" - {
+        // fragment body
+      }.disabled
+
+      "disabled with a message" - {
+        // fragment body
+      }.disabled("message")
+    }.expecting {
+      _ is Seq(
+        Pending(Text("disabled"), "DISABLED"),
+        Pending(Text("disabled with a message"), "message"))
     }
 
   "An example showing multiple features" -

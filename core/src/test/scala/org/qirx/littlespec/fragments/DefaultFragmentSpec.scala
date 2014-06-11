@@ -6,7 +6,7 @@ import scala.util.Random
 import testUtils.assertion.NumericAssertEnhancements
 import org.qirx.littlespec.Specification
 
-object FragmentSpec extends Specification with NumericAssertEnhancements {
+object DefaultFragmentSpec extends Specification with NumericAssertEnhancements {
 
 
   "DefaultFragment" - {
@@ -58,7 +58,10 @@ object FragmentSpec extends Specification with NumericAssertEnhancements {
       "measure duration" - {
         val result1 = execute(success)
         val result2 = execute {
-          Thread.sleep(101)
+          val start = System.currentTimeMillis
+          while (System.currentTimeMillis - start < 101) {
+            // waiting
+          }
           success
         }
 

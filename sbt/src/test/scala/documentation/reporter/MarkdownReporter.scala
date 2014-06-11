@@ -24,7 +24,7 @@ class MarkdownReporter extends SbtReporter {
   val defaultReporter = new DefaultSbtReporter
 
   lazy val targetDirectory = {{
-      val directory = new File(BuildInfo.baseDirectory, "documentation")
+      val directory = BuildInfo.documentationTarget
       if (!directory.exists) directory.mkdir
       directory
     }

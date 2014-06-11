@@ -4,6 +4,7 @@ import scala.scalajs.js
 import scala.scalajs.test.Test
 import scala.scalajs.test.{TestFramework => ScalaJSTestFramework}
 import scala.scalajs.test.TestOutput
+import org.qirx.littlespec.Specification
 
 object TestFramework extends ScalaJSTestFramework {
 
@@ -17,7 +18,8 @@ object TestFramework extends ScalaJSTestFramework {
       val results = specification.executeFragments()
       try reporter.report(testOutput, results)
       catch {
-        case e: Throwable => testOutput.error("Problem in reporter " + e)
+        case e: Throwable =>
+          testOutput.error("Problem in ScalaJsReporter " + e/*, e.getStackTrace*/)
       }
 
     } else testOutput.error("Can only run tests if they extend " + classOf[Specification].getName)

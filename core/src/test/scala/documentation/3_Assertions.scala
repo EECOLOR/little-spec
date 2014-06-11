@@ -10,7 +10,7 @@ import org.qirx.littlespec.fragments.Text
 import testUtils.ExampleUtils
 import testUtils.FailWith
 
-object `3_Assertions` extends Specification with ExampleUtils { self =>
+object `_3_Assertions` extends Specification with ExampleUtils { self =>
 
   "The simplest form of assertions are the static assertions" - {
     new SpecificationExample {
@@ -49,8 +49,8 @@ object `3_Assertions` extends Specification with ExampleUtils { self =>
         def result2 = 2 must throwAn[OtherCustomException]
 
         def message(name: String) = s"Expected '$name' but no exception was thrown"
-        result1 failsWith message("CustomException")
-        result2 failsWith message("OtherCustomException")
+        result1 failsWith message("documentation.CustomException")
+        result2 failsWith message("documentation.OtherCustomException")
       }
 
       example {
@@ -81,8 +81,8 @@ object `3_Assertions` extends Specification with ExampleUtils { self =>
         }
 
         def message(name: String) = s"Expected '$name' but no exception was thrown"
-        result1 failsWith message("CustomException")
-        result2 failsWith message("OtherCustomException")
+        result1 failsWith message("documentation.CustomException")
+        result2 failsWith message("documentation.OtherCustomException")
       }
 
       example {
@@ -126,10 +126,10 @@ object `3_Assertions` extends Specification with ExampleUtils { self =>
 
       "It fails when the instance if not of the correct type" - {
         1 must beAnInstanceOf[String] failsWith
-          "Integer is not an instance of String"
+          "java.lang.Integer is not an instance of java.lang.String"
 
         new CustomInstance must beAnInstanceOf[OtherCustomType] failsWith
-          "CustomInstance is not an instance of OtherCustomType"
+          "documentation.CustomInstance is not an instance of documentation.OtherCustomType"
       }
     }
 

@@ -1,3 +1,5 @@
+*This file is generated using sbt*
+
 Little Spec
 ===========
 
@@ -6,12 +8,13 @@ A small test framework for [sbt](http://www.scala-sbt.org/) and [Scala.js](http:
 Installation
 ============
 
-**sbt**
+sbt
+---
 
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %% "little-spec-sbt" % "0.1-SNAPSHOT" % "test"
+libraryDependencies += "org.qirx" %% "little-spec" % "[version]" % "test"
 ```
 
 Add the test framework
@@ -20,12 +23,13 @@ Add the test framework
 testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework")
 ```
 
-**Scala.js**
+Scala.js
+---
 
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %%% "little-spec-scalajs" % "0.1-SNAPSHOT" % "test"
+libraryDependencies += "org.qirx" %%% "little-spec" % "[version]" % "test"
 ```
 
 Add the test framework
@@ -37,7 +41,7 @@ scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
 Usage
 =====
 
-**This documentation is generated from `documentation.1_GettingStarted`**
+**This documentation is generated from `documentation._1_GettingStarted`**
 
 ---
 To create a specification, extend an object or class with `Specification`
@@ -63,6 +67,16 @@ Fragments can be nested
     // fragment body
   }
 }
+```
+Fragments can be disabled
+```scala
+"disabled" - {
+  // fragment body
+}.disabled
+
+"disabled with a message" - {
+  // fragment body
+}.disabled("message")
 ```
 An example showing multiple features
 ```scala
@@ -123,7 +137,7 @@ object ExampleSpec extends Specification {
 ```
 
 
-**This documentation is generated from `documentation.2_AssertEnhancements`**
+**This documentation is generated from `documentation._2_AssertEnhancements`**
 
 ---
 A few enhancements are added for every type, meaning that calling the
@@ -174,7 +188,7 @@ result failsWith "failed"
 ```
 
 
-**This documentation is generated from `documentation.3_Assertions`**
+**This documentation is generated from `documentation._3_Assertions`**
 
 ---
 The simplest form of assertions are the static assertions
@@ -202,8 +216,8 @@ def result1 = 1 must throwA[CustomException]
 def result2 = 2 must throwAn[OtherCustomException]
 
 def message(name: String) = s"Expected '$name' but no exception was thrown"
-result1 failsWith message("CustomException")
-result2 failsWith message("OtherCustomException")
+result1 failsWith message("documentation.CustomException")
+result2 failsWith message("documentation.OtherCustomException")
 ```
 ```scala
 def code1: Any = throw new CustomException
@@ -256,7 +270,7 @@ result2 is success
 It fails when the instance if not of the correct type
 
 
-**This documentation is generated from `documentation.4_ExampleFragments`**
+**This documentation is generated from `documentation._4_ExampleFragments`**
 
 ---
 Sometimes you want to show how your library is used, the problem with
@@ -274,7 +288,7 @@ example {
 ```
 
 
-**This documentation is generated from `documentation.5_Customization`**
+**This documentation is generated from `documentation._5_Customization`**
 
 ---
 There are a lot of ways in which you can make things more readable and usable

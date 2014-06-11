@@ -4,6 +4,7 @@ import scala.scalajs.test.TestOutput
 import scala.scalajs.test.TestOutputLog
 import org.qirx.littlespec.macros.Location
 import org.qirx.littlespec.io.Source
+import org.qirx.littlespec.Specification
 
 object ScalaJsReporterSpec extends Specification { self =>
 
@@ -137,6 +138,7 @@ object ScalaJsReporterSpec extends Specification { self =>
 [$info]${" "}
 """
 
+    /*
     if (result != expected) {
       println("result: ")
       println(result.split("\n").mkString("", "|\n", "|"))
@@ -148,10 +150,11 @@ object ScalaJsReporterSpec extends Specification { self =>
       println("Result (for visual inspection):")
       println(result.split("\n").mkString(">  ", "\n>  ", ""))
     }
+    */
 
     result is expected
-
-  }
+  }.disabled(
+      "Disabled while source mappings are disabled, see: https://github.com/scala-js/scala-js/issues/727")
 
   class TestOutputMock extends TestOutput {
     var result = ""
