@@ -4,6 +4,8 @@ organization := "org.qirx"
 
 scalaVersion := "2.11.1"
 
+crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1")
+
 PublishSettings.rootProjectSettings
 
 ReleaseSettings.rootProjectSettings
@@ -30,7 +32,10 @@ lazy val librarySettings =
   ) ++ 
   scriptedSettings ++
   Seq(
-    scriptedLaunchOpts += "-Dlibrary.version=" + version.value
+    scriptedLaunchOpts ++= Seq(
+      "-Dlibrary.version=" + version.value,
+      "-Dscala.version=" + scalaVersion.value
+    )
   ) ++
   macrosOutputAsResource ++
   macrosAsDependency ++ 

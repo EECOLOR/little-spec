@@ -29,7 +29,7 @@ object DefaultFragmentSpec extends Specification with NumericAssertEnhancements 
     "execution should" - {
 
       "return pending todo for unit" - {
-        execute() is Pending(defaultTitle, "TODO")
+        execute(()) is Pending(defaultTitle, "TODO")
       }
 
       "return pending todo for todo" - {

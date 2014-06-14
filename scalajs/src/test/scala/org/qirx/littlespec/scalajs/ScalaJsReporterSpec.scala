@@ -41,7 +41,7 @@ object ScalaJsReporterSpec extends Specification { self =>
             1 + 2 is 2
           }
           "nested deeper" - {
-            "empty" - ()
+            "empty" - {}
           }
         }
       }
@@ -73,7 +73,7 @@ object ScalaJsReporterSpec extends Specification { self =>
             x is y
           }
           "nested deeper\nmultiline" - {
-            "empty\nmultiline" - ()
+            "empty\nmultiline" - {}
           }
         }
       }

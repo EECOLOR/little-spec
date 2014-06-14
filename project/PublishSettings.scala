@@ -6,10 +6,7 @@ import xerial.sbt.Sonatype.sonatypeSettings
 object PublishSettings {
 
   def rootProjectSettings = 
-    sonatypeSettings ++ disablePublishing ++
-    Seq(
-      crossScalaVersions := Seq("2.10.4", "2.11.1")
-    )
+    sonatypeSettings ++ disablePublishing
     
   lazy val disablePublishing = Seq(
     publishArtifact := false,
