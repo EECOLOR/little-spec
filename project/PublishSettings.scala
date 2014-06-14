@@ -1,19 +1,16 @@
 import sbt._
 import Keys._
 import com.typesafe.sbt.SbtPgp.PgpKeys.publishSigned
-import xerial.sbt.Sonatype.SonatypeKeys.sonatypeRelease
 import xerial.sbt.Sonatype.sonatypeSettings
 
 object PublishSettings {
 
   def rootProjectSettings = 
-    disablePublishing ++
+    sonatypeSettings ++ disablePublishing ++
     Seq(
       crossScalaVersions := Seq("2.10.4", "2.11.1")
     )
     
-  lazy val sonatypeReleaseWithInput = taskKey[Boolean]("sonatypeReleaseWithInput")
-
   lazy val disablePublishing = Seq(
     publishArtifact := false,
     publishSigned := (),
@@ -21,9 +18,7 @@ object PublishSettings {
   )
 
   lazy val librarySettings = 
-    sonatypeSettings ++
     Seq(
-      sonatypeReleaseWithInput <<= sonatypeRelease.toTask(" Release"),
       publishTo := {
         val nexus = "https://oss.sonatype.org/"
         if (isSnapshot.value)

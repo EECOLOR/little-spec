@@ -3,8 +3,8 @@ import Keys._
 import sbtrelease.ReleasePlugin.{ReleaseKeys => release, releaseSettings}
 import sbtrelease.ReleaseStateTransformations._
 import org.qirx.sbtrelease.UpdateVersionInFiles.updateVersionInFiles
-import PublishSettings.sonatypeReleaseWithInput
 import com.typesafe.sbt.SbtPgp.PgpKeys.publishSigned
+import xerial.sbt.Sonatype.SonatypeKeys.sonatypeReleaseAll
 
 object ReleaseSettings {
   
@@ -24,7 +24,7 @@ object ReleaseSettings {
           commitReleaseVersion,
           tagRelease,
           publishSignedArtifacts,
-          closeAndReleaseAtSonatype,
+          sonatypeRelease,
           setNextVersion,
           commitNextVersion,
           pushChanges
@@ -62,6 +62,6 @@ object ReleaseSettings {
     extracted.runAggregated(publishSigned in Global in ref, st)
   }
 
-  lazy val closeAndReleaseAtSonatype = 
-    sbtrelease.releaseTask(sonatypeReleaseWithInput in ThisProject)
+  lazy val sonatypeRelease = 
+    sbtrelease.releaseTask(sonatypeReleaseAll in ThisProject)
 }
