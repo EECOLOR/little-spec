@@ -14,7 +14,7 @@ sbt
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %% "little-spec" % "0.2" % "test"
+libraryDependencies += "org.qirx" %% "little-spec" % "0.3" % "test"
 ```
 
 Add the test framework
@@ -29,13 +29,13 @@ Scala.js
 Add the framework as library dependency
 
 ```scala
-libraryDependencies += "org.qirx" %%% "little-spec" % "0.2" % "test"
+libraryDependencies += "org.qirx" %%% "little-spec" % "0.3" % "test"
 ```
 
 Add the test framework
 
 ```scala
-scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
+ScalaJSKeys.scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
 ```
 
 Usage
