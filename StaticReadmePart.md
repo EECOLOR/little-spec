@@ -33,7 +33,7 @@ libraryDependencies += "org.qirx" %%% "little-spec" % "version" % "test"
 Add the test framework
 
 ```scala
-scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
+ScalaJSKeys.scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
 ```
 
 Usage

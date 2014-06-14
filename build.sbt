@@ -20,20 +20,26 @@ lazy val `little-spec` = project
   .aggregate(`little-spec-sbt`, `little-spec-scalajs`)
 
 lazy val librarySettings = 
+  onlyScalaSources ++ 
   Seq(
     name := "little-spec",
     organization := "org.qirx",
     core(Compile, "main"),
     core(Test, "test"),
-    macrosOutputAsResource
+    resolvers += Classpaths.typesafeReleases
   ) ++ 
+  scriptedSettings ++
+  Seq(
+    scriptedLaunchOpts += "-Dlibrary.version=" + version.value
+  ) ++
+  macrosOutputAsResource ++
   macrosAsDependency ++ 
   PublishSettings.librarySettings
 
 lazy val `little-spec-sbt` = project
   .in( file("sbt") )
   .settings(
-    onlyScalaSources ++ librarySettings ++ buildInfoSettings ++ compileTestClassSettings:_*)
+    librarySettings ++ buildInfoSettings ++ compileTestClassSettings:_*)
   .settings(
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
     testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework"),
@@ -54,7 +60,14 @@ lazy val `little-spec-sbt` = project
 lazy val `little-spec-scalajs` = project
   .in( file("scalajs") )
   .settings(
-    onlyScalaSources ++ librarySettings ++ scalaJSSettings:_*)
+    librarySettings ++ scalaJSSettings:_*)
+  .settings(
+    // make sure the scalajs files from resourceGenerators are included
+    includeFilter in resourceGenerators in Compile := {
+      import scala.scalajs.tools.jsdep.JSDependencyManifest.ManifestFileName
+      val includedFiles = (includeFilter in resourceGenerators in Compile).value
+      includedFiles || ManifestFileName || "*.sjsir" || "*.js"
+    })
   .settings(
     libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-test-bridge" % scalaJSVersion,
     ScalaJSKeys.scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
@@ -82,17 +95,6 @@ def core(configuration:Configuration, config:String) =
   unmanagedSourceDirectories in configuration +=
     (baseDirectory in ThisBuild).value / "core" / "src" / config / "scala"  
   
-lazy val macrosFullClasspath = fullClasspath in Compile in `little-spec-macros`
-  
-lazy val macrosOutputAsResource = 
-  unmanagedResourceDirectories in Compile += 
-    (classDirectory in Compile in `little-spec-macros`).value
-
-lazy val macrosAsDependency = Seq(
-  internalDependencyClasspath in Compile ++= macrosFullClasspath.value,
-  internalDependencyClasspath in Test ++= macrosFullClasspath.value
-)
-  
 lazy val onlyScalaSources = Seq(
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
   unmanagedSourceDirectories in Test := Seq((scalaSource in Test).value)
@@ -110,3 +112,27 @@ lazy val compileTestClassSettings =
     test in Test <<= (test in Test).dependsOn(compile in CompileTestClasses)
   )
 
+lazy val macrosAsDependency = 
+  macroSettings ++
+  Seq(
+    internalDependencyClasspath in Compile += macrosCompiledClassDirectory.value,
+    internalDependencyClasspath in Test += macrosCompiledClassDirectory.value
+  )
+
+lazy val macrosOutputAsResource = Seq(
+  includeFilter in resourceGenerators in Compile := "*.class",
+  resourceGenerators in Compile += Def.task {
+    val dir = macrosCompiledClassDirectory.value
+    val includedFiles = (includeFilter in resourceGenerators in Compile).value
+    val files = (dir ** includedFiles).get
+    files
+  }.taskValue,
+  managedResourceDirectories in Compile += macrosClassDirectory.value
+)
+  
+lazy val macrosClassDirectory = classDirectory in Compile in `little-spec-macros`
+
+lazy val macrosCompiledClassDirectory = 
+   macrosClassDirectory
+     .map(identity) // convert the setting into a task
+     .dependsOn(compile in Compile in `little-spec-macros`)
