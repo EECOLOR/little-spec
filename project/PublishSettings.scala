@@ -14,7 +14,8 @@ object PublishSettings {
   lazy val disablePublishing = Seq(
     publishArtifact := false,
     publishSigned := (),
-    publish := ()
+    publish := (),
+    publishLocal := ()
   )
 
   lazy val librarySettings = 

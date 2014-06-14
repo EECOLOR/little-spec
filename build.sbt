@@ -10,6 +10,13 @@ ReleaseSettings.rootProjectSettings
 
 lazy val `little-spec` = project
   .in( file(".") )
+  .settings(
+    clean <<= clean.dependsOn(
+      clean in `little-spec-macros`,
+      clean in `little-spec-sbt`,
+      clean in `little-spec-scalajs`
+    )
+  )
   .aggregate(`little-spec-sbt`, `little-spec-scalajs`)
 
 lazy val librarySettings = 
@@ -18,8 +25,9 @@ lazy val librarySettings =
     organization := "org.qirx",
     core(Compile, "main"),
     core(Test, "test"),
-    macroOutputAsResource
+    macrosOutputAsResource
   ) ++ 
+  macrosAsDependency ++ 
   PublishSettings.librarySettings
 
 lazy val `little-spec-sbt` = project
@@ -42,7 +50,6 @@ lazy val `little-spec-sbt` = project
     ),
     buildInfoPackage := "org.qirx.littlespec"
   )
-  .dependsOn(`little-spec-macros`)
 
 lazy val `little-spec-scalajs` = project
   .in( file("scalajs") )
@@ -52,7 +59,6 @@ lazy val `little-spec-scalajs` = project
     libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-test-bridge" % scalaJSVersion,
     ScalaJSKeys.scalaJSTestFramework in Test := "org.qirx.littlespec.scalajs.TestFramework"
   )
-  .dependsOn(`little-spec-macros`)
 
 // separate project to help with IDE support
 lazy val `little-spec-macros` = project 
@@ -76,8 +82,16 @@ def core(configuration:Configuration, config:String) =
   unmanagedSourceDirectories in configuration +=
     (baseDirectory in ThisBuild).value / "core" / "src" / config / "scala"  
   
-lazy val macroOutputAsResource = 
-  unmanagedResourceDirectories in Compile += (classDirectory in Compile in `little-spec-macros`).value
+lazy val macrosFullClasspath = fullClasspath in Compile in `little-spec-macros`
+  
+lazy val macrosOutputAsResource = 
+  unmanagedResourceDirectories in Compile += 
+    (classDirectory in Compile in `little-spec-macros`).value
+
+lazy val macrosAsDependency = Seq(
+  internalDependencyClasspath in Compile ++= macrosFullClasspath.value,
+  internalDependencyClasspath in Test ++= macrosFullClasspath.value
+)
   
 lazy val onlyScalaSources = Seq(
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
@@ -91,9 +105,7 @@ lazy val compileTestClassSettings =
   Seq(
     unmanagedSourceDirectories in CompileTestClasses := Seq(baseDirectory.value / "testClasses"),
     classDirectory in CompileTestClasses := baseDirectory.value / "testClasses",
-    unmanagedClasspath in CompileTestClasses += (classDirectory in Compile).value,
-    // compile sbt before compiling testClasses
-    compile in CompileTestClasses <<= (compile in CompileTestClasses).dependsOn(compile in Compile),
+    internalDependencyClasspath in CompileTestClasses ++= (fullClasspath in Compile).value,
     // compile test classes before running tests
     test in Test <<= (test in Test).dependsOn(compile in CompileTestClasses)
   )
