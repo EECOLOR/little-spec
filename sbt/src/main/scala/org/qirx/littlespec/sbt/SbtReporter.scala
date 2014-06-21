@@ -24,7 +24,7 @@ trait SbtReporter {
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit
 }
 
-class DefaultSbtReporter extends SbtReporter {
+class DefaultSbtReporter(args:Array[String]) extends SbtReporter {
 
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit = {
 

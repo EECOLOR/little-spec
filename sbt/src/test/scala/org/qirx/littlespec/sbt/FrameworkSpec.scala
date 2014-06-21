@@ -1,6 +1,7 @@
 package org.qirx.littlespec.sbt
 
 import java.io.File
+import java.lang.reflect.InvocationTargetException
 import java.net.URLClassLoader
 
 import org.qirx.littlespec.BuildInfo
@@ -77,15 +78,19 @@ object FrameworkSpec extends Specification with CollectionAssertions {
   "The Runner" - {
 
     val location = BuildInfo.testClasses
-    println(location)
     val testClassLoader = new URLClassLoader(Array(location.toURI.toURL), getClass.getClassLoader)
     def newRunner = framework.runner(Array.empty, Array.empty, testClassLoader)
 
     "should be able to instantiate a custom reporter" - {
       val reporterName = classOf[ThrowWhenConstructedReporter].getName
 
-      framework.runner(Array("reporter", reporterName), Array.empty, testClassLoader) must
-        throwA[ThrowWhenConstructedReporter.Constructed.type]
+      val args = Array("reporter", reporterName)
+
+      framework.runner(args, Array.empty, testClassLoader) must
+        throwA[InvocationTargetException].like {
+          case ex => 
+            ex.getCause is ThrowWhenConstructedReporter.Constructed(args)
+        }
     }
 
     "should return an empty string when done is called" - {
@@ -193,14 +198,14 @@ object FrameworkSpec extends Specification with CollectionAssertions {
   }
 }
 
-class ThrowWhenConstructedReporter {
-  throw ThrowWhenConstructedReporter.Constructed
+class ThrowWhenConstructedReporter(args: Array[String]) {
+  throw ThrowWhenConstructedReporter.Constructed(args)
 }
 object ThrowWhenConstructedReporter {
-  case object Constructed extends Throwable
+  case class Constructed(args: Array[String]) extends Throwable
 }
 
-class ThrowingReporter extends SbtReporter {
+class ThrowingReporter(args:Array[String]) extends SbtReporter {
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit =
     throw ThrowingReporter.Report(taskDef, eventHandler, loggers, results)
 }

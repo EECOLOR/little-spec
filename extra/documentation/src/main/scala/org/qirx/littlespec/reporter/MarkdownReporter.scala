@@ -1,17 +1,18 @@
-package documentation.reporter
+package org.qirx.littlespec.reporter
 
 import java.io.File
 
-import org.qirx.littlespec.BuildInfo
-import org.qirx.littlespec.fragments.Code
-import org.qirx.littlespec.fragments.CompoundResult
-import org.qirx.littlespec.fragments.Failure
-import org.qirx.littlespec.fragments.Pending
 import org.qirx.littlespec.fragments.Result
+import org.qirx.littlespec.fragments.Pending
 import org.qirx.littlespec.fragments.Success
-import org.qirx.littlespec.fragments.Text
-import org.qirx.littlespec.fragments.Title
+import org.qirx.littlespec.fragments.Failure
 import org.qirx.littlespec.fragments.UnexpectedFailure
+import org.qirx.littlespec.fragments.CompoundResult
+import org.qirx.littlespec.fragments.Text
+import org.qirx.littlespec.fragments.Code
+import org.qirx.littlespec.fragments.Title
+
+import org.qirx.littlespec.sbt.ArgumentExtractor
 import org.qirx.littlespec.sbt.DefaultSbtReporter
 import org.qirx.littlespec.sbt.SbtReporter
 
@@ -19,12 +20,17 @@ import sbt.testing.EventHandler
 import sbt.testing.Logger
 import sbt.testing.TaskDef
 
-class MarkdownReporter extends SbtReporter {
+class MarkdownReporter(args:Array[String]) extends SbtReporter {
 
-  val defaultReporter = new DefaultSbtReporter
+  val argumentExtractor = new ArgumentExtractor(args)
+  
+  val defaultReporter = new DefaultSbtReporter(args)
 
   lazy val targetDirectory = {{
-      val directory = BuildInfo.documentationTarget
+      val directory = argumentExtractor
+          .getArg("documentationTarget")
+          .map(new File(_))
+          .getOrElse(sys.error("Test option `documentationTarget` not found"))
       if (!directory.exists) directory.mkdir
       directory
     }
@@ -35,8 +41,8 @@ class MarkdownReporter extends SbtReporter {
     val fullyQualifiedName = taskDef.fullyQualifiedName
     if (fullyQualifiedName startsWith "documentation.") {
 
-      val name = fullyQualifiedName.replaceAll("documentation\\.", "")
-      val file = new File(targetDirectory, name + ".md")
+      val fileName = MarkdownReporter.fileName(fullyQualifiedName)
+      val file = new File(targetDirectory, fileName)
 
       println(s"Reporting $fullyQualifiedName in ${file.getAbsolutePath}")
 
@@ -91,4 +97,11 @@ class MarkdownReporter extends SbtReporter {
     val p = new java.io.PrintWriter(f)
     try { op(p) } finally { p.close() }
   }
+}
+
+object MarkdownReporter {
+  def fileName(fullyQualifiedName:String) = 
+    name(fullyQualifiedName) + ".md"
+  def name(fullyQualifiedName:String) =
+    fullyQualifiedName.replaceAll("documentation\\.", "")
 }

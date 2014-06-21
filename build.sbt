@@ -16,10 +16,11 @@ lazy val `little-spec` = project
     clean <<= clean.dependsOn(
       clean in `little-spec-macros`,
       clean in `little-spec-sbt`,
-      clean in `little-spec-scalajs`
+      clean in `little-spec-scalajs`,
+      clean in `little-spec-extra-documentation`
     )
   )
-  .aggregate(`little-spec-sbt`, `little-spec-scalajs`)
+  .aggregate(`little-spec-sbt`, `little-spec-scalajs`, `little-spec-extra-documentation`)
 
 lazy val librarySettings = 
   onlyScalaSources ++ 
@@ -48,26 +49,26 @@ lazy val `little-spec-sbt` = project
   .settings(
     libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
     testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework"),
-    testOptions += Tests.Argument("reporter", "documentation.reporter.MarkdownReporter"))
+    testOptions += Tests.Argument("reporter", "org.qirx.littlespec.reporter.MarkdownReporter"),
+    testOptions += Tests.Argument("documentationTarget", 
+      ((baseDirectory in ThisBuild).value / "documentation").getAbsolutePath))
   .settings(
-    sourceGenerators in Compile <+= buildInfo,
+    sourceGenerators in Test <+= buildInfo,
     buildInfoKeys := Seq[BuildInfoKey](
-      BuildInfoKey.map(baseDirectory in ThisBuild) { 
-        case (_, value) => "documentationTarget" -> value / "documentation" 
-      },
       BuildInfoKey.map(baseDirectory) { 
         case (_, value) => "testClasses" -> value / "testClasses" 
       }
     ),
     buildInfoPackage := "org.qirx.littlespec"
   )
-
+  .settings(internalDependencyClasspath in Test ++= (internalDependencyClasspath in LateInitialization).value)
+  
 lazy val `little-spec-scalajs` = project
   .in( file("scalajs") )
   .settings(
     librarySettings ++ scalaJSSettings:_*)
   .settings(
-    // make sure the scalajs files from resourceGenerators are included
+    // make sure the scalajs files from resourceGenerators (macros) are included
     includeFilter in resourceGenerators in Compile := {
       import scala.scalajs.tools.jsdep.JSDependencyManifest.ManifestFileName
       val includedFiles = (includeFilter in resourceGenerators in Compile).value
@@ -84,6 +85,38 @@ lazy val `little-spec-macros` = project
   .settings(onlyScalaSources ++ macroSettings ++ scalaJSSettings:_*)
   .settings(publishArtifact := false)  
   
+def extraLibrarySettings(libraryName:String) = 
+  onlyScalaSources ++ 
+  Seq(
+    name := libraryName,
+    organization := "org.qirx",
+    resolvers += Classpaths.typesafeReleases
+  ) ++ 
+  scriptedSettings ++
+  Seq(
+    scriptedLaunchOpts ++= Seq(
+      "-Dlibrary.version=" + version.value,
+      "-Dscala.version=" + scalaVersion.value
+    )
+  ) ++
+  PublishSettings.librarySettings
+  
+lazy val `little-spec-extra-documentation` = project
+  .in( file("extra/documentation") )
+  .settings(extraLibrarySettings("little-spec-extra-documentation"):_*)
+  .dependsOn(`little-spec-sbt`)
+
+lazy val LateInitialization = config("lateInitialization")
+  
+internalDependencyClasspath in LateInitialization in `little-spec-sbt` := Seq(
+  Attributed.blank(
+    (classDirectory in Compile in `little-spec-extra-documentation`)
+      .map(identity) // convert the setting into a task
+      .dependsOn(compile in Compile in `little-spec-extra-documentation`)
+      .value
+  )
+)
+
 lazy val macroSettings = 
   Seq(
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,

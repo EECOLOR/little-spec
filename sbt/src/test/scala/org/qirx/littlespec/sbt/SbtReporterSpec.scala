@@ -22,7 +22,7 @@ import testUtils.TaskDefFactory
 
 class SbtReporterSpec extends Specification {
 
-  val reporter = new DefaultSbtReporter
+  val reporter = new DefaultSbtReporter(Array.empty)
 
   "DefaultSbtReporter should" - {
 

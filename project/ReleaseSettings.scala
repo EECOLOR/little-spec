@@ -66,7 +66,7 @@ object ReleaseSettings {
 
   lazy val readme = file("README.md")
 
-  lazy val updateVersionInReadme = updateVersionInFiles(Seq(readme))
+  lazy val updateVersionInReadme = updateVersionInFiles(Seq(readme, file("extra/documentation/README.md")))
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = publishSignedArtifactsAction, 

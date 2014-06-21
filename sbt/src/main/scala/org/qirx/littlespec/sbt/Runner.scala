@@ -9,14 +9,14 @@ class Runner(
   val remoteArgs: Array[String],
   val testClassLoader: ClassLoader) extends sbt.testing.Runner {
 
-  private val reporter = getArg("reporter")
+  val argumentExtractor = new ArgumentExtractor(args)
+  
+  private val reporter = argumentExtractor.getArg("reporter")
     .map(testClassLoader.loadClass)
-    .map(_.newInstance())
+    .map(_.getConstructors.head)
+    .map(_.newInstance(args))
     .map(_.asInstanceOf[SbtReporter])
-    .getOrElse(new DefaultSbtReporter)
-
-  private def getArg(name: String) =
-    args.sliding(2, 1).find(_.head == name).flatMap(_.lastOption)
+    .getOrElse(new DefaultSbtReporter(args))
 
   private var isDone = false
 
