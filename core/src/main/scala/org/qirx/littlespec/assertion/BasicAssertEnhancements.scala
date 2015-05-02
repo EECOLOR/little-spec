@@ -4,7 +4,7 @@ import org.qirx.littlespec.fragments.Fragment
 
 trait BasicAssertEnhancements { self: StaticAssertions =>
 
-  implicit class IsEnhancement[A](result: => A) {
+  implicit class IsEnhancement[A](result: A) {
     def is[B](expected: B): Fragment.Body = {
       if (result != expected) failure(result + " is not equal to " + expected)
       else success
