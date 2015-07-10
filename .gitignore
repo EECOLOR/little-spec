@@ -9,4 +9,5 @@ dist/
 .target
 *.class
 .idea
+*.sjsir
 
