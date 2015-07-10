@@ -12,7 +12,7 @@ ReleaseSettings.rootProjectSettings
 
 lazy val `little-spec` = project
   .in(file("."))
-  .aggregate(`little-spec-core-jvm`, `little-spec-core-js`)
+  .aggregate(`little-spec-core-jvm`, `little-spec-core-js`, `little-spec-extra-documentation`)
 
 lazy val librarySettings =
     Seq(
@@ -55,7 +55,11 @@ lazy val `little-spec-core` = crossProject
       "org.scala-sbt" % "test-interface" % "1.0",
       "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
     ),
-    testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework")
+    testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework"),
+    testOptions += Tests.Argument("reporter", "org.qirx.littlespec.reporter.MarkdownReporter"),
+    testOptions += Tests.Argument("documentationTarget",
+      ((baseDirectory in ThisBuild).value / "documentation").getAbsolutePath),
+    internalDependencyClasspath in Test ++= (internalDependencyClasspath in LateInitialization).value
   )
 
 lazy val `little-spec-core-js` = `little-spec-core`.js
@@ -71,6 +75,22 @@ lazy val `little-spec-macros` = crossProject
 
 lazy val `little-spec-macros-js` = `little-spec-macros`.js
 lazy val `little-spec-macros-jvm` = `little-spec-macros`.jvm
+
+lazy val `little-spec-extra-documentation` = project
+  .in( file("extra/documentation") )
+  .settings(extraLibrarySettings("little-spec-extra-documentation"):_*)
+  .dependsOn(`little-spec-core-jvm`)
+
+lazy val LateInitialization = config("lateInitialization")
+
+internalDependencyClasspath in LateInitialization in `little-spec-core-jvm` := Seq(
+  Attributed.blank(
+    (classDirectory in Compile in `little-spec-extra-documentation`)
+      .map(identity) // convert the setting into a task
+      .dependsOn(compile in Compile in `little-spec-extra-documentation`)
+      .value
+  )
+)
 
 def extraLibrarySettings(libraryName: String) =
     Seq(
