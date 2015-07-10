@@ -124,8 +124,8 @@ lazy val CompileTestClasses = config("compileTestClasses").extend(Compile)
 lazy val compileTestClassSettings =
   inConfig(CompileTestClasses)(Defaults.configSettings) ++
     Seq(
-      unmanagedSourceDirectories in CompileTestClasses := Seq(baseDirectory.value / "testClasses"),
-      classDirectory in CompileTestClasses := baseDirectory.value / "testClasses",
+      unmanagedSourceDirectories in CompileTestClasses := Seq(baseDirectory.value / "../shared/testClasses"),
+      classDirectory in CompileTestClasses := baseDirectory.value / "../shared/testClasses",
       internalDependencyClasspath in CompileTestClasses ++= (fullClasspath in Compile).value,
       // compile test classes before running tests
       test in Test <<= (test in Test).dependsOn(compile in CompileTestClasses)
