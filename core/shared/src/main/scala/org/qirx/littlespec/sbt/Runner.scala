@@ -1,5 +1,6 @@
 package org.qirx.littlespec.sbt
 
+import org.scalajs.testinterface.TestUtils
 import sbt.testing.TaskDef
 import sbt.testing.SubclassFingerprint
 import org.qirx.littlespec.Specification
@@ -12,10 +13,7 @@ class Runner(
   val argumentExtractor = new ArgumentExtractor(args)
 
   private val reporter = argumentExtractor.getArg("reporter")
-    .map(testClassLoader.loadClass)
-    .map(_.getConstructors.head)
-    .map(_.newInstance(args))
-    .map(_.asInstanceOf[SbtReporter])
+    .map(fullyQualifiedName => getReporterWithName(fullyQualifiedName, args))
     .getOrElse(new DefaultSbtReporter(args))
 
   private var isDone = false
@@ -27,19 +25,30 @@ class Runner(
 
   private def toTask(taskDef: TaskDef): Task[_] = {
     val isObject = testIsObject(taskDef)
-    val testClass = loadClassWithName(taskDef.fullyQualifiedName, isObject)
-    Task(testClass, isObject, taskDef, reporter)
+    val testInstance =
+      getSpecificationWithName(taskDef.fullyQualifiedName, isObject)
+
+    Task(testInstance, taskDef, reporter)
   }
+
+  private def getSpecificationWithName(name: String, isObject: Boolean): Specification = {
+    val testInstance =
+      if (isObject) TestUtils.loadModule(name, testClassLoader)
+      else TestUtils.newInstance(name, testClassLoader)(Seq())
+
+    testInstance.asInstanceOf[Specification]
+  }
+
+  private def getReporterWithName(name: String, args: Array[String]): SbtReporter = {
+    val testInstance =
+      TestUtils.newInstance(name, testClassLoader)(Seq(args))
+
+    testInstance.asInstanceOf[SbtReporter]
+  }
+
 
   private def testIsObject(taskDef: TaskDef): Boolean =
     taskDef.fingerprint.asInstanceOf[SubclassFingerprint].isModule
-
-  private def loadClassWithName(name: String, isObject: Boolean): Class[_ <: Specification] = {
-    var realName = name
-    if (isObject) realName += "$"
-    val loadedClass = testClassLoader.loadClass(realName)
-    loadedClass.asSubclass(classOf[Specification])
-  }
 
   def done: String = {
     isDone = true

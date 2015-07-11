@@ -7,15 +7,17 @@ import org.qirx.littlespec.Specification
 import org.qirx.littlespec.fragments.Success
 import org.qirx.littlespec.fragments.Text
 
-import testUtils.ExampleUtils
+import testUtils.{NoJSExportSpecification, ExampleUtils}
 
 object `_1_GettingStarted` extends Specification with ExampleUtils { gettingStarted =>
+
+  // override specification, otherwise scalajs will try to export nested objects which isn't supported
+  // had to remove the import in the examples below for scalajs so this class gets used
+  class Specification extends NoJSExportSpecification;
 
   """|To create a specification, extend an object or class with `Specification`
        |and create a fragment. An empty fragment results in a `TODO`.""".stripMargin -
     new Example {
-      import org.qirx.littlespec.Specification
-
       object ExampleSpec extends Specification {
         "implicit fragment" - {
           // fragment body
@@ -61,8 +63,6 @@ object `_1_GettingStarted` extends Specification with ExampleUtils { gettingStar
 
   "An example showing multiple features" -
     new Example {
-      import org.qirx.littlespec.Specification
-
       object ExampleSpec extends Specification {
 
         trait Adder[T] {

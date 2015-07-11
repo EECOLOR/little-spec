@@ -7,7 +7,7 @@ import org.qirx.littlespec.macros.Location
 
 trait ExampleUtils { self:Specification =>
 
-  class SpecificationExample(implicit location: Location) extends Specification {
+  class SpecificationExample(implicit location: Location) extends NoJSExportSpecification {
     def expecting(result: Seq[Result] => FragmentBody) = {
       self.createFragment(Source.codeAtLocation(location), result(this.executeFragments()))
     }

@@ -4,8 +4,6 @@
 To create a specification, extend an object or class with `Specification`
 and create a fragment. An empty fragment results in a `TODO`.
 ```scala
-import org.qirx.littlespec.Specification
-
 object ExampleSpec extends Specification {
   "implicit fragment" - {
     // fragment body
@@ -37,8 +35,6 @@ Fragments can be disabled
 ```
 An example showing multiple features
 ```scala
-import org.qirx.littlespec.Specification
-
 object ExampleSpec extends Specification {
 
   trait Adder[T] {

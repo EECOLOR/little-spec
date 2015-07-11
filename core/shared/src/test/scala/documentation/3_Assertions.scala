@@ -125,8 +125,8 @@ object `_3_Assertions` extends Specification with ExampleUtils { self =>
       }
 
       "It fails when the instance if not of the correct type" - {
-        1 must beAnInstanceOf[String] failsWith
-          "java.lang.Integer is not an instance of java.lang.String"
+        BigInt(1) must beAnInstanceOf[String] failsWith
+          "scala.math.BigInt is not an instance of java.lang.String"
 
         new CustomInstance must beAnInstanceOf[OtherCustomType] failsWith
           "documentation.CustomInstance is not an instance of documentation.OtherCustomType"
