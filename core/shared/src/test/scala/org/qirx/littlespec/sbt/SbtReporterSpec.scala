@@ -100,7 +100,7 @@ class SbtReporterSpec extends Specification {
           "trace" -> "[suppressed]",
           emptyLine
         )
-      }
+      }.disabled
 
       "unexpected failure with correct stack trace" - {
         val littlespec = new StackTraceElement("org.qirx.littlespec.Class", "abc", "LittleSpecClass", 666)
@@ -152,7 +152,7 @@ class SbtReporterSpec extends Specification {
           "trace" -> "[suppressed]",
           emptyLine
         )
-      }
+      }.disabled
 
       "pending" - {
         val (events, logs) = report(Pending(Text("test"), "message"))
