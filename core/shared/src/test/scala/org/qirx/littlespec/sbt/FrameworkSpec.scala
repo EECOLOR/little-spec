@@ -1,13 +1,21 @@
 package org.qirx.littlespec.sbt
 
-import org.qirx.littlespec.Specification
+import org.qirx.littlespec.{AbstractSpecification, Specification}
+import org.qirx.littlespec.assertion.Assertion
 import org.qirx.littlespec.fragments.Result
+import org.qirx.littlespec.fragments.Success
+import org.qirx.littlespec.fragments.Text
+
+import sbt.testing.Event
 import sbt.testing.EventHandler
 import sbt.testing.Logger
 import sbt.testing.TaskDef
+import testUtils.TaskDefFactory
 import testUtils.assertion.CollectionAssertions
 
-object FrameworkSpec extends Specification with CollectionAssertions {
+import scala.scalajs.js.annotation.JSExport
+
+abstract class FrameworkSpec extends AbstractSpecification with CollectionAssertions {
 
   val framework = new TestFramework
 
@@ -64,8 +72,137 @@ object FrameworkSpec extends Specification with CollectionAssertions {
       runner.asInstanceOf[Runner].testClassLoader is testClassLoader
     }
   }
+
+  "The Runner" - {
+
+    def newRunner = framework.runner(Array.empty, Array.empty, newClassLoader)
+
+    "should be able to instantiate a custom reporter" - {
+      val reporterName = classOf[ThrowWhenConstructedReporter].getName
+
+      val args = Array("reporter", reporterName)
+
+      framework.runner(args, Array.empty, newClassLoader) must constructRunnerWithArgs(args)
+    }
+
+    "should return an empty string when done is called" - {
+      newRunner.done is ""
+    }
+
+    "should throw an illegal state exception when tasks is called after done" - {
+      val runner = newRunner
+      runner.done
+      runner.tasks(Array.empty) must throwAn[IllegalStateException].like { e =>
+        e.getMessage contains "done" is true
+        e.getMessage contains "tasks" is true
+      }
+    }
+
+    "should return the correct tasks" - {
+
+      def testTaskCreation(testClassName: String, isObject: Boolean) = {
+        var actualTestClassName = testClassName
+        if (isObject) actualTestClassName += "$"
+        val taskDef = TaskDefFactory.create(testClassName, isObject)
+
+        val tasks = newRunner.tasks(Array(taskDef))
+
+        tasks isLike {
+          case Array(task: Task[_]) =>
+            task.testInstance.getClass.getName is actualTestClassName
+            task.taskDef is taskDef
+        }
+      }
+      "for objects" - testTaskCreation("testUtils.EmptyObject", isObject = true)
+      "for classes" - testTaskCreation("testUtils.EmptyClass", isObject = false)
+    }
+  }
+
+  def newClassLoader: ClassLoader = ???
+  def constructRunnerWithArgs(args: Array[String]): Assertion[Any]  = ???
+
+  "The Task" - {
+
+    def newTask(testClass: Class[_], forObject: Boolean, args: Array[String] = Array.empty) = {
+      val framework = new TestFramework
+      val runner = framework.runner(args, Array.empty, newClassLoader)
+
+      val taskDef = TaskDefFactory.create(testClass.getName, forObject)
+
+      runner.tasks(Array(taskDef)).head
+    }
+
+    val noOpEventHandler =
+      new EventHandler {
+        def handle(e: Event): Unit = ???
+      }
+
+    val noOpLogger =
+      new Logger {
+        def ansiCodesSupported(): Boolean = ???
+
+        def debug(message: String): Unit = ???
+
+        def error(message: String): Unit = ???
+
+        def info(message: String): Unit = ???
+
+        def trace(throwable: Throwable): Unit = ???
+
+        def warn(message: String): Unit = ???
+      }
+
+    "should return no tasks for an empty specification" - {
+
+      def testExecuteEmpty(forObject: Boolean) = {
+        val task = newTask(classOf[EmptyTestSpecification], forObject)
+        val tasks = task.execute(noOpEventHandler, Array(noOpLogger))
+
+        tasks.size is 0
+      }
+
+      "for classes" - testExecuteEmpty(forObject = false)
+      "for objects" - testExecuteEmpty(forObject = true)
+    }
+
+    "should report the results correctly" - {
+
+      def testReporting(forObject: Boolean) = {
+
+        val className = classOf[ThrowingReporter].getName
+
+        val task = newTask(
+          testClass = classOf[TestSpecification],
+          forObject,
+          args = Array("reporter", className))
+
+        task.execute(noOpEventHandler, Array(noOpLogger)) must
+          throwA[ThrowingReporter.Report].like {
+            case ThrowingReporter.Report(taskDef, eventHandler, Seq(logger), results) =>
+              taskDef is task.taskDef
+              eventHandler is noOpEventHandler
+              logger is noOpLogger
+              results isLike {
+                case Seq(Success(Text("test"))) => success
+              }
+          }
+      }
+
+      "for classes" - testReporting(forObject = false)
+      "for objects" - testReporting(forObject = true)
+    }
+  }
 }
 
+@JSExport
+class ThrowWhenConstructedReporter(args: Array[String]) {
+  throw ThrowWhenConstructedReporter.Constructed(args)
+}
+object ThrowWhenConstructedReporter {
+  case class Constructed(args: Array[String]) extends Throwable
+}
+
+@JSExport
 class ThrowingReporter(args:Array[String]) extends SbtReporter {
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit =
     throw ThrowingReporter.Report(taskDef, eventHandler, loggers, results)
