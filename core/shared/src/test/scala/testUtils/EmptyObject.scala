@@ -1,4 +1,4 @@
-package test
+package testUtils
 
 import org.qirx.littlespec.Specification
 

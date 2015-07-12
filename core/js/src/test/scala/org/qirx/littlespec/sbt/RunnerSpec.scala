@@ -1,10 +1,14 @@
 package org.qirx.littlespec.sbt
 
-import java.lang.reflect.InvocationTargetException
-
 import org.qirx.littlespec.Specification
+import org.scalajs.testinterface.ScalaJSClassLoader
+import sbt.testing.{EventHandler, Logger, TaskDef}
+import org.qirx.littlespec.fragments.Result
 import testUtils.TaskDefFactory
 import testUtils.assertion.CollectionAssertions
+
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExport
 
 object RunnerSpec extends Specification with CollectionAssertions {
 
@@ -12,7 +16,7 @@ object RunnerSpec extends Specification with CollectionAssertions {
 
   "The Runner" - {
 
-    val testClassLoader = getClass.getClassLoader
+    val testClassLoader = new ScalaJSClassLoader(js.Dynamic.global)
     def newRunner = framework.runner(Array.empty, Array.empty, testClassLoader)
 
     "should be able to instantiate a custom reporter" - {
@@ -21,9 +25,9 @@ object RunnerSpec extends Specification with CollectionAssertions {
       val args = Array("reporter", reporterName)
 
       framework.runner(args, Array.empty, testClassLoader) must
-        throwA[InvocationTargetException].like {
+        throwA[ThrowWhenConstructedReporter.Constructed].like {
           case ex =>
-            ex.getCause is ThrowWhenConstructedReporter.Constructed(args)
+            ex.args is args
         }
     }
 
@@ -61,8 +65,12 @@ object RunnerSpec extends Specification with CollectionAssertions {
   }
 }
 
-class ThrowWhenConstructedReporter(args: Array[String]) {
+@JSExport
+class ThrowWhenConstructedReporter(args: Array[String]) extends SbtReporter {
   throw ThrowWhenConstructedReporter.Constructed(args)
+  def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit =
+    throw ThrowingReporter.Report(taskDef, eventHandler, loggers, results)
+
 }
 object ThrowWhenConstructedReporter {
   case class Constructed(args: Array[String]) extends Throwable

@@ -35,19 +35,6 @@ lazy val `little-spec-core` = crossProject
   .settings(
     librarySettings ++ macroSettings: _*
   )
-  .enablePlugins(BuildInfoPlugin)
-  .settings(
-    Seq(
-      sourceGenerators in Test <+= buildInfo,
-      buildInfoKeys := Seq[BuildInfoKey](
-        BuildInfoKey.map(baseDirectory) {
-          case (_, value) => "testClasses" -> value / "../shared/testClasses"
-        }
-      ),
-      buildInfoPackage := "org.qirx.littlespec"
-    ) ++
-      compileTestClassSettings: _*
-  )
   .jsSettings(
     libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion,
     testFrameworks += new TestFramework("org.qirx.littlespec.sbt.TestFramework")
@@ -66,17 +53,6 @@ lazy val `little-spec-core` = crossProject
 
 lazy val `little-spec-core-js` = `little-spec-core`.js
 lazy val `little-spec-core-jvm` = `little-spec-core`.jvm
-
-lazy val CompileTestClasses = config("compileTestClasses").extend(Compile)
-lazy val compileTestClassSettings =
-  inConfig(CompileTestClasses)(Defaults.configSettings) ++
-    Seq(
-      unmanagedSourceDirectories in CompileTestClasses := Seq(baseDirectory.value / "../shared/testClasses"),
-      classDirectory in CompileTestClasses := baseDirectory.value / "../shared/testClasses",
-      internalDependencyClasspath in CompileTestClasses ++= (fullClasspath in Compile).value,
-      // compile test classes before running tests
-      test in Test <<= (test in Test).dependsOn(compile in CompileTestClasses)
-    )
 
 // separate project to help with IDE support
 lazy val `little-spec-macros` = crossProject
