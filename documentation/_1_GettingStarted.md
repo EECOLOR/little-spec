@@ -3,6 +3,7 @@
 ---
 To create a specification, extend an object or class with `Specification`
 and create a fragment. An empty fragment results in a `TODO`.
+`Specification` is a trait, so you can also use it as a mixin if needed.
 ```scala
 object ExampleSpec extends Specification {
   "implicit fragment" - {

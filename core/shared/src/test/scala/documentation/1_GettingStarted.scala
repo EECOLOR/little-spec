@@ -16,7 +16,8 @@ object `_1_GettingStarted` extends Specification with ExampleUtils { gettingStar
   class Specification extends NoJSExportSpecification;
 
   """|To create a specification, extend an object or class with `Specification`
-       |and create a fragment. An empty fragment results in a `TODO`.""".stripMargin -
+       |and create a fragment. An empty fragment results in a `TODO`.
+       |`Specification` is a trait, so you can also use it as a mixin if needed.""".stripMargin -
     new Example {
       object ExampleSpec extends Specification {
         "implicit fragment" - {
