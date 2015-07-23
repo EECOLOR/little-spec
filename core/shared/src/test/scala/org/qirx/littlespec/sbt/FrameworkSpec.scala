@@ -1,6 +1,6 @@
 package org.qirx.littlespec.sbt
 
-import org.qirx.littlespec.{AbstractSpecification, Specification}
+import org.qirx.littlespec.Specification
 import org.qirx.littlespec.assertion.Assertion
 import org.qirx.littlespec.fragments.Result
 import org.qirx.littlespec.fragments.Success
@@ -15,7 +15,7 @@ import testUtils.assertion.CollectionAssertions
 
 import scala.scalajs.js.annotation.JSExport
 
-abstract class FrameworkSpec extends AbstractSpecification with CollectionAssertions {
+abstract class FrameworkSpec extends Specification with CollectionAssertions {
 
   val framework = new TestFramework
 
