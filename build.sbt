@@ -4,7 +4,7 @@ organization := "org.qirx"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.7")
+crossScalaVersions in ThisBuild := Seq("2.10.5", "2.11.7")
 
 PublishSettings.rootProjectSettings
 
@@ -71,8 +71,8 @@ lazy val macroSettings =
     libraryDependencies ++= {
       if (scalaVersion.value startsWith "2.11.") Seq.empty
       else Seq(
-        compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
-        "org.scalamacros" %% "quasiquotes" % "2.0.0" cross CrossVersion.binary
+        compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
+        "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
       )
     }
   )
