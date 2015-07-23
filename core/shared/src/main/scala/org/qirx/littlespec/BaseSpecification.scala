@@ -9,7 +9,7 @@ import org.qirx.littlespec.fragments.ExampleFragments
 import org.qirx.littlespec.fragments.FragmentContainer
 import org.qirx.littlespec.fragments.Fragment
 
-abstract trait BaseSpecification
+trait BaseSpecification
   extends FragmentContainer
   with ExampleFragments
   with StaticAssertions

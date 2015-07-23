@@ -2,4 +2,4 @@ package testUtils
 
 import org.qirx.littlespec.BaseSpecification
 
-abstract trait NoJSExportSpecification extends BaseSpecification
+trait NoJSExportSpecification extends BaseSpecification
