@@ -18,7 +18,6 @@ import scala.scalajs.js.annotation.JSExport
 abstract class FrameworkSpec extends Specification with CollectionAssertions {
 
   def newClassLoader: ClassLoader
-  def constructRunnerWithArgs(args: Array[String]): Assertion[Any]
 
   val framework = new TestFramework
 
@@ -75,6 +74,8 @@ abstract class FrameworkSpec extends Specification with CollectionAssertions {
       runner.asInstanceOf[Runner].testClassLoader is testClassLoader
     }
   }
+
+  def constructRunnerWithArgs(args: Array[String]): Assertion[Any]
 
   "The Runner" - {
 
