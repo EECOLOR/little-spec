@@ -5,7 +5,7 @@ import org.scalajs.testinterface.ScalaJSClassLoader
 
 import scala.scalajs.js
 
-object JSFrameworkSpec extends FrameworkSpec {
+object FrameworkSpec extends AbstractFrameworkSpec {
   override def newClassLoader: ClassLoader = new ScalaJSClassLoader(js.Dynamic.global)
 
   override def constructRunnerWithArgs(args: Array[String]): Assertion[Any] =

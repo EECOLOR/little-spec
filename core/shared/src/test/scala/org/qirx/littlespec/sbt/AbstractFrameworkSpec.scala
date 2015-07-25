@@ -15,7 +15,7 @@ import testUtils.assertion.CollectionAssertions
 
 import scala.scalajs.js.annotation.JSExport
 
-abstract class FrameworkSpec extends Specification with CollectionAssertions {
+abstract class AbstractFrameworkSpec extends Specification with CollectionAssertions {
 
   def newClassLoader: ClassLoader
 
