@@ -1,6 +1,8 @@
 // format: +preserveDanglingCloseParenthesis
 package org.qirx.littlespec.sbt
 
+import org.qirx.littlespec.assertion.Assertion
+
 import scala.concurrent.duration.DurationInt
 import org.qirx.littlespec.fragments.Code
 import org.qirx.littlespec.fragments.CompoundResult
@@ -20,9 +22,13 @@ import sbt.testing.Selector
 import sbt.testing.Status
 import testUtils.TaskDefFactory
 
-class SbtReporterSpec extends Specification {
+abstract class AbstractSbtReporterSpec extends Specification {
 
-  val reporter = new DefaultSbtReporter(Array.empty)
+  def newDefaultReporter(args:Array[String]): SbtReporter
+
+  def containStackTraceOf(exception: Exception): Assertion[Seq[(String, String)]]
+
+  val reporter = newDefaultReporter(Array.empty)
 
   "DefaultSbtReporter should" - {
 
@@ -64,95 +70,50 @@ class SbtReporterSpec extends Specification {
           emptyLine)
       }
 
-      "failure with correct location" - {
-
-        val throwable = new Fragment.Failure("failure")
-        throwable.setStackTrace(Array(
-          new StackTraceElement("org.qirx.littlespec.Class", "abc", "LittleSpecClass", 666),
-          new StackTraceElement("scala.Class", "abc", "ScalaClass", 666),
-          new StackTraceElement("java.Class", "abc", "JavaClass", 666),
-          new StackTraceElement("sbt.Class", "abc", "SbtClass", 666),
-          new StackTraceElement("org_qirx_littlespec.Class", "abc", "TestClass", 333)
-        ))
-
-        val (_, logs) = report(Failure(Text("test"), "message", throwable))
-
-        logs is Seq(
-          errorLog(s"$failureIndicator test (TestClass:333)"),
-          errorLog(s"    message"),
-          emptyLine)
-      }
-
       "unexpected failure" - {
         val unexpectedFailure = new Exception("message")
-        val stackTrace = unexpectedFailure.getStackTrace.take(2).map { s =>
-          "SbtReporterSpec.scala:" + s.getLineNumber + " (org.qirx.littlespec.sbt.SbtReporterSpec)"
-        }
         val (events, logs) = report(UnexpectedFailure(Text("test"), unexpectedFailure))
 
         events is Seq(Event(Status.Error))
 
-        logs is Seq(
+        logs.size is 7
+        logs.take(2) is Seq(
           errorLog(s"$failureIndicator test"),
-          errorLog(s"    Exception: message"),
-          errorLog(s"    - ${stackTrace(0)}"),
-          errorLog(s"    - ${stackTrace(1)}"),
-          "trace" -> "[suppressed]",
-          emptyLine
+          errorLog(s"    Exception: message")
         )
-      }.disabled
-
-      "unexpected failure with correct stack trace" - {
-        val littlespec = new StackTraceElement("org.qirx.littlespec.Class", "abc", "LittleSpecClass", 666)
-        val sbt = new StackTraceElement("sbt.Class", "abc", "SbtClass", 666)
-        val java = new StackTraceElement("java.Class", "abc", "JavaClass", 666)
-        val scala = new StackTraceElement("scala.Class", "abc", "ScalaClass", 666)
-
-        val unexpectedFailure = new Exception("message")
-        unexpectedFailure.setStackTrace(Array(
-          littlespec, sbt, java, scala,
-          new StackTraceElement("org_qirx_littlespec.Class1", "abc", "TestClass1", 111),
-          littlespec, sbt, java, scala,
-          new StackTraceElement("org_qirx_littlespec.Class2", "abc", "TestClass2", 222),
-          littlespec, sbt, java, scala
-        ))
-
-        val (events, logs) = report(UnexpectedFailure(Text("test"), unexpectedFailure))
-
-        logs is Seq(
-          errorLog(s"$failureIndicator test"),
-          errorLog(s"    Exception: message"),
-          errorLog(s"    - TestClass1:111 (org_qirx_littlespec.Class1)"),
-          errorLog(s"    - TestClass2:222 (org_qirx_littlespec.Class2)"),
+        logs.drop(2).take(3) must containStackTraceOf(unexpectedFailure)
+        logs.drop(5).take(2) is Seq(
           "trace" -> "[suppressed]",
           emptyLine
         )
       }
 
       "unexpected failure with cause" - {
-        def line(s: StackTraceElement) =
-          "SbtReporterSpec.scala:" + s.getLineNumber + " (org.qirx.littlespec.sbt.SbtReporterSpec)"
-
         val unexpectedCause = new Exception("cause")
-        val stackTrace2 = unexpectedCause.getStackTrace.take(2).map(line)
         val unexpectedFailure = new Exception("failure", unexpectedCause)
-        val stackTrace1 = unexpectedFailure.getStackTrace.take(2).map(line)
 
-        val (events, logs) = report(UnexpectedFailure(Text("test"), unexpectedFailure))
+        val (_, logs) = report(UnexpectedFailure(Text("test"), unexpectedFailure))
+        val logs1 = logs.takeWhile(p => p != errorLog(s"    == Caused by =="))
+        val logs2 = logs.dropWhile(p => p != errorLog(s"    == Caused by =="))
 
-        logs is Seq(
+        logs1.size is 5
+        logs1.take(2) is Seq(
           errorLog(s"$failureIndicator test"),
-          errorLog(s"    Exception: failure"),
-          errorLog(s"    - ${stackTrace1(0)}"),
-          errorLog(s"    - ${stackTrace1(1)}"),
+          errorLog(s"    Exception: failure")
+        )
+        logs1.drop(2).take(3) must containStackTraceOf(unexpectedFailure)
+
+        logs2.size is 7
+        logs2.take(2) is Seq(
           errorLog(s"    == Caused by =="),
-          errorLog(s"    Exception: cause"),
-          errorLog(s"    - ${stackTrace2(0)}"),
-          errorLog(s"    - ${stackTrace2(1)}"),
+          errorLog(s"    Exception: cause")
+        )
+        logs2.drop(2).take(3) must containStackTraceOf(unexpectedCause)
+        logs2.drop(5).take(2) is Seq(
           "trace" -> "[suppressed]",
           emptyLine
         )
-      }.disabled
+      }
 
       "pending" - {
         val (events, logs) = report(Pending(Text("test"), "message"))
@@ -252,7 +213,7 @@ class SbtReporterSpec extends Specification {
 
   val throwableFailure = new Fragment.Failure("failure")
   val (fileName, lineNumber) = {
-    val s = throwableFailure.getStackTrace.head
+    val s = throwableFailure.getStackTrace.filter(s => s.getFileName.contains("SbtReporterSpec")).head
     (s.getFileName, s.getLineNumber)
   }
 

@@ -24,7 +24,11 @@ trait SbtReporter {
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit
 }
 
-class DefaultSbtReporter(args:Array[String]) extends SbtReporter {
+abstract class AbstractDefaultSbtReporter(args:Array[String]) extends SbtReporter {
+
+  protected def isLittleSpecTest(className: String, fileName: String): Boolean
+
+  protected def isIgnored(className: String, fileName: String): Boolean
 
   def report(taskDef: TaskDef, eventHandler: EventHandler, loggers: Seq[Logger], results: Seq[Result]): Unit = {
 
@@ -154,22 +158,13 @@ class DefaultSbtReporter(args:Array[String]) extends SbtReporter {
   private def filteredStackTrace(throwable: Throwable) =
     throwable.getStackTrace.filter { s =>
       val className = classNameOf(s)
-      isLittleSpecTest(className) || !(className matches pattern)
+      isLittleSpecTest(className, s.getFileName) || !isIgnored(className, s.getFileName)
     }
 
   private def getLocationOf(throwable: Throwable) =
     filteredStackTrace(throwable).headOption.map { s =>
       " (" + s.getFileName + ":" + s.getLineNumber + ")"
     }.getOrElse("")
-
-  private def isLittleSpecTest(className: String) =
-    className.startsWith("org.qirx.littlespec.") && className.endsWith("Spec")
-
-  private val ignoredPackages = Seq("org.qirx.littlespec.", "scala.", "java.", "sbt.")
-  private val pattern =
-    ignoredPackages
-      .mkString("^(", "|", ")[^$]*")
-      .replaceAll("\\.", "\\\\.")
 
   private def classNameOf(s: StackTraceElement) =
     s.getClassName.split("\\$").head
