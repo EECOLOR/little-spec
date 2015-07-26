@@ -19,6 +19,8 @@ abstract class AbstractFrameworkSpec extends Specification with CollectionAssert
 
   def newClassLoader: ClassLoader
 
+  val classLoader = newClassLoader
+
   val framework = new TestFramework
 
   "The framework" - {
@@ -79,14 +81,14 @@ abstract class AbstractFrameworkSpec extends Specification with CollectionAssert
 
   "The Runner" - {
 
-    def newRunner = framework.runner(Array.empty, Array.empty, newClassLoader)
+    def newRunner = framework.runner(Array.empty, Array.empty, classLoader)
 
     "should be able to instantiate a custom reporter" - {
       val reporterName = classOf[ThrowWhenConstructedReporter].getName
 
       val args = Array("reporter", reporterName)
 
-      framework.runner(args, Array.empty, newClassLoader) must constructRunnerWithArgs(args)
+      framework.runner(args, Array.empty, classLoader) must constructRunnerWithArgs(args)
     }
 
     "should return an empty string when done is called" - {
@@ -126,7 +128,7 @@ abstract class AbstractFrameworkSpec extends Specification with CollectionAssert
 
     def newTask(testClass: Class[_], forObject: Boolean, args: Array[String] = Array.empty) = {
       val framework = new TestFramework
-      val runner = framework.runner(args, Array.empty, newClassLoader)
+      val runner = framework.runner(args, Array.empty, classLoader)
 
       val taskDef = TaskDefFactory.create(testClass.getName, forObject)
 
