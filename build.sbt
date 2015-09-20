@@ -1,8 +1,6 @@
-name := "little-spec"
-
 organization := "org.qirx"
 
-scalaVersion := "2.11.7"
+scalaVersion in ThisBuild := "2.11.7"
 
 crossScalaVersions in ThisBuild := Seq("2.10.5", "2.11.7")
 
@@ -12,6 +10,7 @@ ReleaseSettings.rootProjectSettings
 
 lazy val `little-spec` = project
   .in(file("."))
+  .settings(name := "little-spec-root")
   .aggregate(`little-spec-core-jvm`, `little-spec-core-js`, `little-spec-extra-documentation`)
 
 lazy val librarySettings =

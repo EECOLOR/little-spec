@@ -121,7 +121,7 @@ abstract class AbstractDefaultSbtReporter(args:Array[String]) extends SbtReporte
           sep = "\n" + levelIndentation + compensation + indicatorIndentation,
           end = "")
 
-    logFor(loggers, stringColorRemover)(method, levelMessage)
+    logFor(loggers, removeColorFrom)(method, levelMessage)
   }
 
   private def logFor[T](loggers: Seq[Logger], colorRemover: T => T = identity[T] _)(
@@ -136,7 +136,7 @@ abstract class AbstractDefaultSbtReporter(args:Array[String]) extends SbtReporte
       method(logger)(cleanMessage)
     }
 
-  private def stringColorRemover(message: String) = {
+  private def removeColorFrom(message: String) = {
     val colorPattern = raw"\u001b\[\d{1,2}m"
     message.replaceAll(colorPattern, "")
   }

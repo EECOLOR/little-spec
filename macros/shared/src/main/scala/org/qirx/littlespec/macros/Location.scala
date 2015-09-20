@@ -1,6 +1,6 @@
 package org.qirx.littlespec.macros
 
-import scala.reflect.macros.Context
+import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
 
 case class Location(filename: String, line: Int, column: Int, lines: Seq[String])

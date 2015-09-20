@@ -6,13 +6,13 @@ import org.qirx.littlespec.fragments.{UnexpectedFailure, Text, Failure, Fragment
 
 object SbtReporterSpec extends AbstractSbtReporterSpec with Specification {
 
-  override def newDefaultReporter(args:Array[String]): SbtReporter = {
+  def newDefaultReporter(args:Array[String]): SbtReporter = {
     new DefaultSbtReporter(Array.empty)
   }
 
-  override def containStackTraceOf(exception: Exception): Assertion[Seq[(String, String)]] = {
+  def containStackTraceOf(exception: Exception): Assertion[Seq[(String, String)]] = {
     new Assertion[Seq[(String, String)]] {
-      override def assert(logs: => Seq[(String, String)]) = {
+      def assert(logs: => Seq[(String, String)]) = {
         val stackTrace = exception.getStackTrace.filter(s => s.getFileName.contains("SbtReporterSpec")).take(2).map { s =>
           s"$fileName:" + s.getLineNumber + " (org.qirx.littlespec.sbt.AbstractSbtReporterSpec)"
         }

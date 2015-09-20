@@ -4,4 +4,4 @@ import scala.scalajs.js.annotation.{JSExportDescendentClasses, JSExportDescenden
 
 @JSExportDescendentObjects
 @JSExportDescendentClasses
-trait Specification extends BaseSpecification
+trait Specification extends UnannotatedSpecification

@@ -1,22 +1,24 @@
 package org.qirx.littlespec.fragments
 
 import org.qirx.littlespec.Specification
-import testUtils.NoJSExportSpecification
+import org.qirx.littlespec.UnannotatedSpecification
 
 object FragmentContainerSpec extends Specification {
+
+  trait Specification extends UnannotatedSpecification
 
   "Specification should be able to execute fragments resulting in" - {
 
     def todoResult(title: String) = Pending(Text(title), "TODO")
 
     "no results if empty" - {
-      val container = new NoJSExportSpecification {}
+      val container = new Specification {}
       container.executeFragments() is Seq.empty
     }
 
     "result of one fragment if one is present" - {
       val container =
-        new NoJSExportSpecification {
+        new Specification {
           "test" - {}
         }
       container.executeFragments() is
@@ -25,7 +27,7 @@ object FragmentContainerSpec extends Specification {
 
     "correct results of nested fragments" - {
       val container =
-        new NoJSExportSpecification {
+        new Specification {
           "test1" - {
             "test2" - {}
             "test3" - {}

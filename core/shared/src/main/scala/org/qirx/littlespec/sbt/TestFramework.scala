@@ -24,11 +24,10 @@ class TestFramework extends sbt.testing.Framework {
     testClassLoader: ClassLoader): sbt.testing.Runner =
     new Runner(arguments, remoteArguments, testClassLoader)
 
+  // Scala.js test interface specific methods
   def slaveRunner(args: Array[String],
                   remoteArgs: Array[String],
                   testClassLoader: ClassLoader,
-                  send: String => Unit) = {
-    new Runner(args, remoteArgs, testClassLoader)
-  }
-
+                  send: String => Unit) =
+    runner(args, remoteArgs, testClassLoader)
 }

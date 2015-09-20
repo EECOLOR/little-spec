@@ -21,6 +21,7 @@ case class Task[T <: Specification](
     Array.empty
   }
 
+  // Scala.js test interface specific methods
   def execute(eventHandler: EventHandler, loggers: Array[Logger],
               continuation: (Array[BaseTask]) => Unit): Unit = {
     continuation(execute(eventHandler, loggers))

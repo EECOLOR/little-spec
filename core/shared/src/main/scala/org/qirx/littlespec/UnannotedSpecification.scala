@@ -9,8 +9,8 @@ import org.qirx.littlespec.fragments.ExampleFragments
 import org.qirx.littlespec.fragments.FragmentContainer
 import org.qirx.littlespec.fragments.Fragment
 
-trait BaseSpecification
-  extends FragmentContainer
+trait UnannotatedSpecification extends AnyRef
+  with FragmentContainer
   with ExampleFragments
   with StaticAssertions
   with BasicAssertEnhancements

@@ -1,9 +1,11 @@
 package org.qirx.littlespec.fragments
 
 import org.qirx.littlespec.Specification
-import testUtils.NoJSExportSpecification
+import org.qirx.littlespec.UnannotatedSpecification
 
 object ExampleFragmentsSpec extends Specification {
+
+  trait Specification extends UnannotatedSpecification
 
   "Specification should provide a way to use code as an example" - {
 
@@ -13,7 +15,7 @@ object ExampleFragmentsSpec extends Specification {
       CompoundResult(Text("test"), Seq(todoResult(message)))
 
     "empty" - {
-      val c = new NoJSExportSpecification {
+      val c = new Specification {
         "test" - example {}
       }
       c.executeFragments() is Seq(result(""))
@@ -24,14 +26,14 @@ object ExampleFragmentsSpec extends Specification {
       val expected = Seq(result("`this will result in a todo`"))
 
       "on a single line" - {
-        val c = new NoJSExportSpecification {
+        val c = new Specification {
           "test" - example { `this will result in a todo` }
         }
         c.executeFragments() is expected
       }
 
       "on multiple lines" - {
-        val c = new NoJSExportSpecification {
+        val c = new Specification {
           "test" - example {
             `this will result in a todo`
           }
@@ -43,7 +45,7 @@ object ExampleFragmentsSpec extends Specification {
     "multiline" - {
       def `this will` = ()
       val `result in a todo` = ()
-      val c = new NoJSExportSpecification {
+      val c = new Specification {
         "test" - example {
           `this will`
           `result in a todo`
@@ -58,7 +60,7 @@ object ExampleFragmentsSpec extends Specification {
       val `result in a todo` = ()
 
       "single line" - {
-        val c = new NoJSExportSpecification {
+        val c = new Specification {
           "test" - example {
             // this will { } } {
             `result in a todo`
@@ -71,7 +73,7 @@ object ExampleFragmentsSpec extends Specification {
       }
 
       "multiline on single line" - {
-        val c = new NoJSExportSpecification {
+        val c = new Specification {
           "test" - example { /* this will { } } { */ `result in a todo` }
         }
         c.executeFragments() is
@@ -80,7 +82,7 @@ object ExampleFragmentsSpec extends Specification {
 
       "multiline" - {
 
-        val c = new NoJSExportSpecification {
+        val c = new Specification {
           "test" - example {
             /*
              * this will { } } {
@@ -98,7 +100,7 @@ object ExampleFragmentsSpec extends Specification {
 
     "nested braces" - {
       val `result in a todo` = ()
-      val c = new NoJSExportSpecification {
+      val c = new Specification {
         "test" - example {
           {
             `result in a todo`
