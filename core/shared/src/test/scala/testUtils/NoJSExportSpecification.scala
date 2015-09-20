@@ -1,0 +1,5 @@
+package testUtils
+
+import org.qirx.littlespec.BaseSpecification
+
+trait NoJSExportSpecification extends BaseSpecification
