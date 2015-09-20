@@ -8,4 +8,7 @@ dist/
 .classpath
 .target
 *.class
-
+.idea
+*.sjsir
+.cache-main
+.cache-test
